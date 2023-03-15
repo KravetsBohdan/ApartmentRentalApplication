@@ -1,0 +1,20 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/apartment_rent
+        username: postgres
+        password: postgres
+    jpa:
+        generate-ddl: true
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+secret: (G+KbPeShVmYq3t6w9y$B&E)H@McQfTj
+
+cloudinary:
+    cloud_name: dopkig9jh
+    api_key: 322728929588587
+    api_secret: X7HKj_Ge2PsJRnt3ZKraFOFRQi8
