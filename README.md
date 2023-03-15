@@ -16,8 +16,11 @@ The application has the following features:
 •	Users can view bookings for their apartments.
 ## Technologies Used
 The following technologies were used to build the application:
+
 •	Spring Boot
+
 •	Angular
+
 •	Postgres
 ## Usage
 Once you have the application up and running, follow these steps to use it:
