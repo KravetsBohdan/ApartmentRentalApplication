@@ -12,9 +12,8 @@ spring:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
 
 
-secret: (G+KbPeShVmYq3t6w9y$B&E)H@McQfTj
-
 cloudinary:
-    cloud_name: dopkig9jh
-    api_key: 322728929588587
-    api_secret: X7HKj_Ge2PsJRnt3ZKraFOFRQi8
+    api_key: ${CLOUDINARY_KEY}
+    api_secret: ${CLOUDINARY_SECRET}
+    cloud_name: ${CLOUDINARY_NAME}
+secret: ${JWT_SECRET}
