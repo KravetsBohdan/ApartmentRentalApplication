@@ -1,9 +1,6 @@
 package com.bkravets.apartmentrentalapp.controller;
 
-import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
-import com.bkravets.apartmentrentalapp.dto.BookingDto;
-import com.bkravets.apartmentrentalapp.dto.UserDto;
-import com.bkravets.apartmentrentalapp.dto.LoginDto;
+import com.bkravets.apartmentrentalapp.dto.*;
 import com.bkravets.apartmentrentalapp.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +42,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDTO) {
-        String token = userService.login(loginDTO);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        AuthResponse response = userService.login(authRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/me")

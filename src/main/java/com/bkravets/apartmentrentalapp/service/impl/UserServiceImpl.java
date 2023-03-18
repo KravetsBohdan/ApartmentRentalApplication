@@ -1,13 +1,10 @@
 package com.bkravets.apartmentrentalapp.service.impl;
 
-import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
-import com.bkravets.apartmentrentalapp.dto.BookingDto;
-import com.bkravets.apartmentrentalapp.dto.UserDto;
-import com.bkravets.apartmentrentalapp.dto.LoginDto;
+import com.bkravets.apartmentrentalapp.dto.*;
 import com.bkravets.apartmentrentalapp.entity.User;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
 import com.bkravets.apartmentrentalapp.exception.UserAlreadyExistsException;
-import com.bkravets.apartmentrentalapp.exception.UserAuthenticationException;
+import com.bkravets.apartmentrentalapp.exception.AuthenticationException;
 import com.bkravets.apartmentrentalapp.mapper.ApartmentMapper;
 import com.bkravets.apartmentrentalapp.mapper.BookingMapper;
 import com.bkravets.apartmentrentalapp.mapper.UserMapper;
@@ -43,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public User getLoggedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UserAuthenticationException("User not authenticated");
+            throw new AuthenticationException("User not authenticated");
         }
         return userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + authentication.getName() + " not found"));
@@ -100,16 +97,17 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public String login(LoginDto loginDTO) {
-        String email = loginDTO.getEmail();
-        String password = loginDTO.getPassword();
+    public AuthResponse login(AuthRequest authRequest) {
+        String email = authRequest.getEmail();
+        String password = authRequest.getPassword();
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return tokenProvider.generateToken(authentication.getName());
+        String token = tokenProvider.generateToken(authentication.getName());
+        return new AuthResponse(token);
     }
 
 }

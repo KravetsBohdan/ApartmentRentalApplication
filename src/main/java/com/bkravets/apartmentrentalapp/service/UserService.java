@@ -1,9 +1,6 @@
 package com.bkravets.apartmentrentalapp.service;
 
-import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
-import com.bkravets.apartmentrentalapp.dto.BookingDto;
-import com.bkravets.apartmentrentalapp.dto.UserDto;
-import com.bkravets.apartmentrentalapp.dto.LoginDto;
+import com.bkravets.apartmentrentalapp.dto.*;
 import com.bkravets.apartmentrentalapp.entity.User;
 
 import java.util.List;
@@ -15,7 +12,7 @@ public interface UserService {
 
     UserDto create(UserDto userDTO);
 
-    String login(LoginDto loginDTO);
+    AuthResponse login(AuthRequest authRequest);
 
     UserDto update(UserDto userDTO);
 
