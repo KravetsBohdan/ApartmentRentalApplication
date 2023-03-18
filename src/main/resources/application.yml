@@ -1,0 +1,17 @@
+cloudinary:
+    api_key: ${CLOUDINARY_KEY}
+    api_secret: ${CLOUDINARY_SECRET}
+    cloud_name: ${CLOUDINARY_NAME}
+secret: ${JWT_SECRET}
+spring:
+    datasource:
+        password: postgres
+        url: jdbc:postgresql://localhost:5432/apartment_rent
+        username: postgres
+    jpa:
+        generate-ddl: true
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
