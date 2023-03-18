@@ -1,11 +1,11 @@
 package com.bkravets.apartmentrentalapp.service.impl;
 
-import com.bkravets.apartmentrentalapp.dto.LoginDto;
+import com.bkravets.apartmentrentalapp.dto.AuthRequest;
 import com.bkravets.apartmentrentalapp.dto.UserDto;
 import com.bkravets.apartmentrentalapp.entity.User;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
 import com.bkravets.apartmentrentalapp.exception.UserAlreadyExistsException;
-import com.bkravets.apartmentrentalapp.exception.UserAuthenticationException;
+import com.bkravets.apartmentrentalapp.exception.AuthenticationException;
 import com.bkravets.apartmentrentalapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class UserServiceTest {
     private UserDto existingUserDto;
     private UserDto newUserDto;
     private User newUser;
-    private LoginDto loginDTO;
+    private AuthRequest authRequest;
     private String existingEmail;
     private String existingPassword;
 
@@ -63,7 +63,7 @@ class UserServiceTest {
         newUserDto = new UserDto(2L,"new@email.com", "+38", "ren", "dou", "encriptedPassword");
 
 
-        loginDTO = new LoginDto("john", "123456");
+        authRequest = new AuthRequest("john", "123456");
     }
 
     @Test
@@ -105,7 +105,7 @@ class UserServiceTest {
 
         // When
         assertThatThrownBy(() -> userService.getCurrentUser())
-                .isInstanceOf(UserAuthenticationException.class)
+                .isInstanceOf(AuthenticationException.class)
                 .hasMessage("User not authenticated");
 
         // Then
