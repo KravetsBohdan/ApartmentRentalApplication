@@ -1,5 +1,6 @@
 # Apartment Rental Application
 This application allows users to rent apartments of other users for a period of time and also allows users to give their apartments for renting. The application is built using Spring Boot, Angular, and Postgres.
+
 Front-end to this app is here - https://github.com/KravetsBohdan/ApartmentRental-frontend
 ## Features
 The application has the following features:
