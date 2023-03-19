@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/apartments/**").permitAll()
                 .requestMatchers("/api/users/login").permitAll()
                 .requestMatchers("/api/users/register").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated();
 
         return http.build();
