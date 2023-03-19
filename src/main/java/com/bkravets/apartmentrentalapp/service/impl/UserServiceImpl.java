@@ -2,8 +2,8 @@ package com.bkravets.apartmentrentalapp.service.impl;
 
 import com.bkravets.apartmentrentalapp.dto.*;
 import com.bkravets.apartmentrentalapp.entity.User;
+import com.bkravets.apartmentrentalapp.exception.BadRequestException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
-import com.bkravets.apartmentrentalapp.exception.UserAlreadyExistsException;
 import com.bkravets.apartmentrentalapp.exception.AuthenticationException;
 import com.bkravets.apartmentrentalapp.mapper.ApartmentMapper;
 import com.bkravets.apartmentrentalapp.mapper.BookingMapper;
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         String email = userDTO.getEmail();
 
         if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException("User with email" + email + " already exists");
+            throw new BadRequestException("User with email" + email + " already exists");
         }
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));

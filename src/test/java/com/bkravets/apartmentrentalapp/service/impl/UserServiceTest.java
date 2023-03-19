@@ -3,8 +3,8 @@ package com.bkravets.apartmentrentalapp.service.impl;
 import com.bkravets.apartmentrentalapp.dto.AuthRequest;
 import com.bkravets.apartmentrentalapp.dto.UserDto;
 import com.bkravets.apartmentrentalapp.entity.User;
+import com.bkravets.apartmentrentalapp.exception.BadRequestException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
-import com.bkravets.apartmentrentalapp.exception.UserAlreadyExistsException;
 import com.bkravets.apartmentrentalapp.exception.AuthenticationException;
 import com.bkravets.apartmentrentalapp.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -161,7 +161,7 @@ class UserServiceTest {
         when(userRepository.existsByEmail(existingEmail)).thenReturn(true);
 
         assertThatThrownBy(() -> userService.create(existingUserDto))
-                .isInstanceOf(UserAlreadyExistsException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessage("User with email" + existingEmail + " already exists");
 
         verify(userRepository).existsByEmail(existingEmail);
