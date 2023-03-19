@@ -3,13 +3,13 @@ package com.bkravets.apartmentrentalapp.service.impl;
 import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
 import com.bkravets.apartmentrentalapp.dto.BookingDto;
 import com.bkravets.apartmentrentalapp.entity.Apartment;
-import com.bkravets.apartmentrentalapp.entity.Booking;
 import com.bkravets.apartmentrentalapp.entity.User;
+import com.bkravets.apartmentrentalapp.exception.AuthorizationException;
+import com.bkravets.apartmentrentalapp.exception.BadRequestException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
 import com.bkravets.apartmentrentalapp.mapper.ApartmentMapper;
 import com.bkravets.apartmentrentalapp.mapper.BookingMapper;
 import com.bkravets.apartmentrentalapp.repository.ApartmentRepository;
-import com.bkravets.apartmentrentalapp.repository.BookingRepository;
 import com.bkravets.apartmentrentalapp.service.ApartmentService;
 import com.bkravets.apartmentrentalapp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -75,22 +75,35 @@ public class ApartmentServiceImpl implements ApartmentService {
         User user = userService.getLoggedUser();
         Apartment apartment = getApartmentById(apartmentId);
         checkIfUserIsOwner(apartment, user);
+
+        if (!apartment.getBookings().isEmpty()) {
+            throw new BadRequestException("You can't delete apartment with bookings");
+        }
+
         apartmentRepository.delete(apartment);
     }
+
+
 
     @Override
     @Transactional
     public List<LocalDate> getBookedDaysByApartmentId(long id) {
         Apartment apartment = getApartmentById(id);
         return apartment.getBookings().stream()
-                .flatMap(booking -> booking.getStartDate().datesUntil(booking.getEndDate().plusDays(1)))
+                .flatMap(booking -> booking.getStartDate()
+                        .datesUntil(booking.getEndDate().plusDays(1)))
                 .toList();
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ApartmentDto> getAllApartments(String city, String query, String sortBy, String sortDir, Pageable pageable) {
+    public Page<ApartmentDto> getAllApartments(String city,
+                                               String query,
+                                               String sortBy,
+                                               String sortDir,
+                                               Pageable pageable) {
+
         Sort sort = Sort.by(sortBy);
         if (sortDir != null && sortDir.equalsIgnoreCase("desc")) {
             sort = sort.descending();
@@ -126,7 +139,7 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     private void checkIfUserIsOwner(Apartment apartment, User user) {
         if (!apartment.getOwner().equals(user)) {
-            throw new ResourceNotFoundException("You are not the owner of this apartment");
+            throw new AuthorizationException("You are not the owner of this apartment");
         }
     }
 
