@@ -3,7 +3,6 @@ package com.bkravets.apartmentrentalapp.controller;
 import com.bkravets.apartmentrentalapp.dto.ErrorDto;
 import com.bkravets.apartmentrentalapp.exception.BadRequestException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
-import com.bkravets.apartmentrentalapp.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -38,11 +37,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDto> handleException(ResourceNotFoundException e) {
 
         return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorDto> handleException(UserAlreadyExistsException e) {
-
-        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
