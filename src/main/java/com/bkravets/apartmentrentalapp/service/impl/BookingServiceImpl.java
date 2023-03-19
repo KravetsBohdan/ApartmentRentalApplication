@@ -129,8 +129,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Scheduled(cron = "0 0 1 * * *")
-    public void cleanupExpiredBookings() {
-        List<Booking> expiredBookings = bookingRepository.findAllByEndDateBefore(LocalDate.now());
-        bookingRepository.deleteAll(expiredBookings);
+    public void cleanupBookings() {
+        List<Booking> bookingsToClear = bookingRepository.findAllByEndDateBeforeOrStatus(LocalDate.now(), Status.REJECTED);
+
+        bookingRepository.deleteAll(bookingsToClear);
     }
 }
