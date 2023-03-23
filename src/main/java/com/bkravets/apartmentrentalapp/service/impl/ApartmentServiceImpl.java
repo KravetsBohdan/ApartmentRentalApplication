@@ -98,18 +98,19 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ApartmentDto> getAllApartments(String city,
+    public Page<ApartmentDto> getAllApartments(int page,
+                                               int size,
+                                               String city,
                                                String query,
                                                String sortBy,
-                                               String sortDir,
-                                               Pageable pageable) {
+                                               String sortDir) {
 
         Sort sort = Sort.by(sortBy);
         if (sortDir != null && sortDir.equalsIgnoreCase("desc")) {
             sort = sort.descending();
         }
 
-        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         if (StringUtils.isEmpty(city) && StringUtils.isEmpty(query)) {
             return apartmentRepository.findAll(pageable)

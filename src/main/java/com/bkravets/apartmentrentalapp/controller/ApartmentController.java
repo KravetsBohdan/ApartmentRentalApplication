@@ -2,12 +2,10 @@ package com.bkravets.apartmentrentalapp.controller;
 
 import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
 import com.bkravets.apartmentrentalapp.dto.BookingDto;
-import com.bkravets.apartmentrentalapp.entity.Booking;
 import com.bkravets.apartmentrentalapp.service.ApartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +35,14 @@ public class ApartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ApartmentDto>> getAllApartments(@RequestParam(required = false) String city,
+    public ResponseEntity<Page<ApartmentDto>> getAllApartments(@RequestParam(required = false) int page,
+                                                               @RequestParam(required = false) int size,
+                                                               @RequestParam(required = false) String city,
                                                                @RequestParam(required = false) String query,
                                                                @RequestParam(required = false, defaultValue = "pricePerDay") String sortBy,
-                                                               @RequestParam(required = false, defaultValue = "asc") String sortDir,
-                                                               Pageable pageable) {
+                                                               @RequestParam(required = false, defaultValue = "asc") String sortDir) {
 
-        Page<ApartmentDto> apartments = apartmentService.getAllApartments(city, query, sortBy, sortDir, pageable);
+        Page<ApartmentDto> apartments = apartmentService.getAllApartments(page, size,city, query, sortBy, sortDir);
         return ResponseEntity.ok(apartments);
     }
 
