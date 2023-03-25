@@ -128,7 +128,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "@daily")
     public void cleanupBookings() {
         List<Booking> bookingsToClear = bookingRepository.findAllByEndDateBeforeOrStatus(LocalDate.now(), Status.REJECTED);
 
