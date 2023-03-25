@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: 001-create-table-users.yaml
+      relativeToChangelogFile: true
+  - include:
+        file: 002-create-table-apartments.yaml
+        relativeToChangelogFile: true
+  - include:
+        file: 003-create-table-bookings.yaml
+        relativeToChangelogFile: true
+  - include:
+        file: 004-create-table-reviews.yaml
+        relativeToChangelogFile: true

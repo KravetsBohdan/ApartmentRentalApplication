@@ -15,15 +15,15 @@
     <description>ApartmentRentalApp</description>
     <properties>
         <java.version>17</java.version>
-        <liquibase-core.version>4.18.0</liquibase-core.version>
         <postgresql.version>42.5.4</postgresql.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <lombok.version>1.18.26</lombok.version>
         <maven-compiler-plugin.version>0.2.0</maven-compiler-plugin.version>
         <rest-assured.version>5.3.0</rest-assured.version>
         <jjwt-api.version>0.11.5</jjwt-api.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.0.2</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.0.4</springdoc-openapi-starter-webmvc-ui.version>
         <h2.version>2.1.214</h2.version>
+        <liquibase-core.version>4.20.0</liquibase-core.version>
     </properties>
     <dependencies>
         <dependency>
@@ -76,6 +76,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase-core.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
@@ -125,8 +132,6 @@
             <version>1.31.0</version>
         </dependency>
     </dependencies>
-
-
 
 
     <build>

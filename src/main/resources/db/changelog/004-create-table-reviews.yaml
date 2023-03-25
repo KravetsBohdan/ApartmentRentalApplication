@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: bohdan
+      changes:
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: rating
+                  type: int
+              - column:
+                  name: review_text
+                  type: varchar(255)
+              - column:
+                  name: apartment_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_reviews_apartments
+                    references: apartments(id)
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_reviews_users
+                    references: users(id)
