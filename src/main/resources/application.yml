@@ -3,16 +3,15 @@ cloudinary:
     api_secret: ${CLOUDINARY_SECRET}
     cloud_name: ${CLOUDINARY_NAME}
 secret: ${JWT_SECRET}
+
 spring:
     datasource:
-        password: postgres
-        url: jdbc:postgresql://localhost:5432/apartment_rent
-        username: postgres
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+        username: ${PGUSER}
+        password: ${PGPASSWORD}
+
     jpa:
-        generate-ddl: true
         hibernate:
-            ddl-auto: update
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.PostgreSQLDialect
+            ddl-auto: none
         show-sql: true
