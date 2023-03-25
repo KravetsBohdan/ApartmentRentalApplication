@@ -111,20 +111,19 @@ public class ApartmentServiceImpl implements ApartmentService {
         }
 
         Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Apartment> apartmentsPage;
 
         if (StringUtils.isEmpty(city) && StringUtils.isEmpty(query)) {
-            return apartmentRepository.findAll(pageable)
-                    .map(ApartmentMapper.INSTANCE::toDTO);
+            apartmentsPage = apartmentRepository.findAll(pageable);
         } else if (StringUtils.isEmpty(city) || city.equalsIgnoreCase("All cities")) {
-            return apartmentRepository.findByTitleContaining(query, pageable)
-                    .map(ApartmentMapper.INSTANCE::toDTO);
+            apartmentsPage = apartmentRepository.findByTitleContaining(query, pageable);
         } else if (StringUtils.isEmpty(query)) {
-            return apartmentRepository.findByCity(city, pageable)
-                    .map(ApartmentMapper.INSTANCE::toDTO);
+            apartmentsPage = apartmentRepository.findByCity(city, pageable);
         } else {
-            return apartmentRepository.findByCityAndTitleContaining(city, query, pageable)
-                    .map(ApartmentMapper.INSTANCE::toDTO);
+            apartmentsPage = apartmentRepository.findByCityAndTitleContaining(city, query, pageable);
         }
+
+        return apartmentsPage.map(ApartmentMapper.INSTANCE::toDTO);
     }
 
     @Override
