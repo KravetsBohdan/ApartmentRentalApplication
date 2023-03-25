@@ -18,13 +18,16 @@ import lombok.Setter;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Min(value = 1, message = "Rating should be at least 1")
     @Max(value = 5, message = "Rating should be at most 5")
+    @Column(name = "rating")
     private int rating;
 
     @NotBlank(message = "Review text is mandatory")
+    @Column(name = "review_text")
     private String reviewText;
 
 

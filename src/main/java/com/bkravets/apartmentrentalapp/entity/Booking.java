@@ -21,14 +21,19 @@ import java.time.LocalDate;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private Status status;
 
     @FutureOrPresent(message = "Start date should not be in the past")
+    @Column(name = "start_date")
     private LocalDate startDate;
 
     @FutureOrPresent(message = "Start date should not be in the past")
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @Min(value = 0, message = "Total price should be non negative")
