@@ -19,7 +19,7 @@ public interface ApartmentService {
 
     List<LocalDate> getBookedDaysByApartmentId(long id);
 
-    Page<ApartmentDto> getAllApartments(int page, int size,  String city, String query, String sortBy, String sortDir);
+    Page<ApartmentDto> getAllApartments(String query, String city, int page, int size, String sortBy, String sortDir);
 
     List<BookingDto> getBookingsByApartmentId(long apartmentId);
 }

@@ -13,7 +13,6 @@ import com.bkravets.apartmentrentalapp.repository.ApartmentRepository;
 import com.bkravets.apartmentrentalapp.service.ApartmentService;
 import com.bkravets.apartmentrentalapp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -97,31 +96,19 @@ public class ApartmentServiceImpl implements ApartmentService {
 
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<ApartmentDto> getAllApartments(int page,
-                                               int size,
+    @Transactional
+    public Page<ApartmentDto> getAllApartments(String query,
                                                String city,
-                                               String query,
+                                               int page,
+                                               int size,
                                                String sortBy,
                                                String sortDir) {
-
-        Sort sort = Sort.by(sortBy);
-        if (sortDir != null && sortDir.equalsIgnoreCase("desc")) {
-            sort = sort.descending();
-        }
-
+        Sort sort = Sort.Direction.ASC.name().equalsIgnoreCase(sortDir)
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Apartment> apartmentsPage;
 
-        if (StringUtils.isEmpty(city) && StringUtils.isEmpty(query)) {
-            apartmentsPage = apartmentRepository.findAll(pageable);
-        } else if (StringUtils.isEmpty(city) || city.equalsIgnoreCase("All cities")) {
-            apartmentsPage = apartmentRepository.findByTitleContaining(query, pageable);
-        } else if (StringUtils.isEmpty(query)) {
-            apartmentsPage = apartmentRepository.findByCity(city, pageable);
-        } else {
-            apartmentsPage = apartmentRepository.findByCityAndTitleContaining(city, query, pageable);
-        }
+        Page<Apartment> apartmentsPage = apartmentRepository.findAllByTitleContainingAndCityContaining(query,city, pageable);
 
         return apartmentsPage.map(ApartmentMapper.INSTANCE::toDTO);
     }

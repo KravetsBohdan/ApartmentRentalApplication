@@ -35,14 +35,14 @@ public class ApartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ApartmentDto>> getAllApartments(@RequestParam(required = false) int page,
-                                                               @RequestParam(required = false) int size,
+    public ResponseEntity<Page<ApartmentDto>> getAllApartments(@RequestParam(required = false) String query,
                                                                @RequestParam(required = false) String city,
-                                                               @RequestParam(required = false) String query,
-                                                               @RequestParam(required = false, defaultValue = "pricePerDay") String sortBy,
+                                                               @RequestParam(required = false, defaultValue = "0") int page,
+                                                               @RequestParam(required = false, defaultValue = "3") int size,
+                                                               @RequestParam(required = false, defaultValue = "id") String sortBy,
                                                                @RequestParam(required = false, defaultValue = "asc") String sortDir) {
 
-        Page<ApartmentDto> apartments = apartmentService.getAllApartments(page, size,city, query, sortBy, sortDir);
+        Page<ApartmentDto> apartments = apartmentService.getAllApartments(query, city, page, size, sortBy, sortDir);
         return ResponseEntity.ok(apartments);
     }
 
