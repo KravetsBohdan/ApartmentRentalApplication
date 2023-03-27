@@ -9,7 +9,7 @@ The application has the following features:
 
 •	Users can update their profile information.
 
-•	Users can list their apartments for renting.
+•	Users can list their apartments for booking.
 
 •	Users can view apartments listed by other users and book them for a period of time.
 
