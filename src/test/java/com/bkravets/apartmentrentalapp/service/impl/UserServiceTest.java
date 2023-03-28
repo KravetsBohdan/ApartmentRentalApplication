@@ -41,7 +41,6 @@ class UserServiceTest {
     private UserDto existingUserDto;
     private UserDto newUserDto;
     private User newUser;
-    private AuthRequest authRequest;
     private String existingEmail;
     private String existingPassword;
 
@@ -63,7 +62,6 @@ class UserServiceTest {
         newUserDto = new UserDto(2L,"new@email.com", "+38", "ren", "dou", "encriptedPassword");
 
 
-        authRequest = new AuthRequest("john", "123456");
     }
 
     @Test
@@ -162,7 +160,7 @@ class UserServiceTest {
 
         assertThatThrownBy(() -> userService.create(existingUserDto))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("User with email" + existingEmail + " already exists");
+                .hasMessage("User with email " + existingEmail + " already exists");
 
         verify(userRepository).existsByEmail(existingEmail);
         verify(userRepository, never()).save(any(User.class));

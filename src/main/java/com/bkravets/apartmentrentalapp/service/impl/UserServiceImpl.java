@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         String email = userDTO.getEmail();
 
         if (userRepository.existsByEmail(email)) {
-            throw new BadRequestException("User with email" + email + " already exists");
+            throw new BadRequestException("User with email " + email + " already exists");
         }
 
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));

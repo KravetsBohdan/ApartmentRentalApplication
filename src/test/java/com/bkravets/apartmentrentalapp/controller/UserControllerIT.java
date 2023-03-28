@@ -1,14 +1,12 @@
 package com.bkravets.apartmentrentalapp.controller;
 
 import com.bkravets.apartmentrentalapp.entity.User;
-import com.bkravets.apartmentrentalapp.repository.ApartmentRepository;
-import com.bkravets.apartmentrentalapp.repository.BookingRepository;
 import com.bkravets.apartmentrentalapp.repository.UserRepository;
 import com.bkravets.apartmentrentalapp.security.TokenProvider;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.parsing.Parser;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -18,8 +16,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class UserControllerIT {
@@ -27,28 +26,12 @@ class UserControllerIT {
     @LocalServerPort
     private int springBootPort = 0;
 
-    private static final String USERS_URL = "/api/users";
-    private static final String USER_URL = "/api/users/me";
-    private static final String LOGIN_URL = "/api/users/login";
-    private static final String REGISTER_URL = "/api/users/register";
+    private final String userUrl = "/api/users/me";
+    private final String loginUrl = "/api/users/login";
+    private final String registerUrl = "/api/users/register";
 
-    private static final User USER_ENTITY = new User(1L, "john@mail.com", "+38", "John", "Doe", "12345678", null, null, null);
-    private static final String USER_JSON = """
-            {
-                "email": "john@mail.com",
-                "firstName": "John",
-                "lastName": "Doe",
-                "phone": "+38",
-                "password": "12345678"
-            }
-            """;
-
-    private static final String LOGIN_JSON = """
-            {
-                "email": "john@mail.com",
-                "password": "12345678"
-            }
-            """;
+    private User user = new User(null, "john@mail.com", "+380504559966",
+            "John", "Doe", "12345678", null, null, null);
 
     @Autowired
     private UserRepository userRepository;
@@ -63,79 +46,137 @@ class UserControllerIT {
 
     @BeforeEach
     void beforeEach() {
-//        User savedUser = userRepository.save(USER_ENTITY);
-//
-//        savedUserId = savedUser.getId();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user = userRepository.save(user);
+        token = tokenProvider.generateToken(user.getEmail());
     }
 
     @AfterEach
     void tearDown() {
-//        bookingRepository.deleteAll();
-//        apartmentRepository.deleteAll();
-//        userRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 
     @Test
-    @Order(1)
-    void shouldCreateUser() {
+    void createUser_whenValidUserShouldCreate() {
+        String userToCreateJson = """
+                    {
+                        "email": "jane@mail.com",
+                        "firstName": "Jane",
+                        "lastName": "Doe",
+                        "phone": "+380504558899",
+                        "password": "87654321"
+                    }
+                    """;
         given()
                 .contentType("application/json")
                 .port(springBootPort)
-                .body(USER_JSON)
-                .when()
-                .post(REGISTER_URL)
-                .then()
+                .body(userToCreateJson)
+        .when()
+                .post(registerUrl)
+        .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("email", equalTo(USER_ENTITY.getEmail()))
-                .body("firstName", equalTo(USER_ENTITY.getFirstName()))
-                .body("lastName", equalTo(USER_ENTITY.getLastName()))
-                .body("phone", equalTo(USER_ENTITY.getPhone()));
+                .body("email", equalTo("jane@mail.com"))
+                .body("firstName", equalTo("Jane"))
+                .body("lastName", equalTo("Doe"))
+                .body("phone", equalTo("+380504558899"));
     }
 
     @Test
-    @Order(2)
-    void shouldLogin() {
-        USER_ENTITY.setPassword(passwordEncoder.encode(USER_ENTITY.getPassword()));
-        userRepository.save(USER_ENTITY);
-        RestAssured.registerParser("text/plain", Parser.JSON);
+    void createUser_WhenEmailAlreadyUsedShouldReturnError() {
+        String userToCreateJson = """
+                    {
+                        "email": "john@mail.com",
+                        "firstName": "Jane",
+                        "lastName": "Doe",
+                        "phone": "+380504558899",
+                        "password": "87654321"
+                    }
+                    """;
         given()
                 .contentType("application/json")
                 .port(springBootPort)
-                .body(LOGIN_JSON)
-                .when()
-                .post(LOGIN_URL)
-                .then()
-                .statusCode(HttpStatus.OK.value());
-        userRepository.delete(USER_ENTITY);
+                .body(userToCreateJson)
+        .when()
+                .post(registerUrl)
+        .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("message", equalTo("User with email john@mail.com already exists"));
+    }
+
+    @Test
+    void login_WhenValidCredentialsShouldReturnToken() {
+        String loginJson = """
+            {
+                "email": "john@mail.com",
+                "password": "12345678"
+            }
+            """;
+
+        given()
+                .contentType("application/json")
+                .port(springBootPort)
+                .body(loginJson)
+        .when()
+                .post(loginUrl)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("token", notNullValue());
+
+    }
+
+    @Test
+    void login_WhenNotValidCredentialsShouldReturnError() {
+        String loginJson = """
+                {
+                    "email": "mail@mail.com"
+                    "password": "12345678"
+                }
+                    """;
+
+        given()
+                .contentType("application/json")
+                .port(springBootPort)
+                .body(loginJson)
+        .when()
+                .post(loginUrl)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+
+
     }
 
 
     @Test
-    @Order(3)
-    void shouldGetUser() {
-        USER_ENTITY.setPassword(passwordEncoder.encode(USER_ENTITY.getPassword()));
-        userRepository.save(USER_ENTITY);
-        token = tokenProvider.generateToken(USER_ENTITY.getEmail());
+    void getUser_WhenUserLoggedInShouldReturnCreateUser() {
         given()
                 .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .port(springBootPort)
-                .when()
-                .get(USER_URL)
-                .then()
+        .when()
+                .get(userUrl)
+        .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("email", equalTo(USER_ENTITY.getEmail()))
-                .body("firstName", equalTo(USER_ENTITY.getFirstName()))
-                .body("lastName", equalTo(USER_ENTITY.getLastName()))
-                .body("phone", equalTo(USER_ENTITY.getPhone()));
-        userRepository.delete(USER_ENTITY);
+                .body("email", equalTo(user.getEmail()))
+                .body("firstName", equalTo(user.getFirstName()))
+                .body("lastName", equalTo(user.getLastName()))
+                .body("phone", equalTo(user.getPhone()));
+    }
+
+    @Test
+    void getUser_WhenUserNotLoggedInShouldReturnError() {
+        given()
+                .contentType("application/json")
+                .port(springBootPort)
+        .when()
+                .get(userUrl)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
 
     @Test
-    @Order(4)
-    void shouldUpdateUser() {
+    void updateUser_WhenUserLoggedInShouldReturnUpdatedUser() {
         String updatedUserJSON = """
                 {
                     "firstName": "Dan",
@@ -144,23 +185,37 @@ class UserControllerIT {
                 }
                 """;
 
-        USER_ENTITY.setPassword(passwordEncoder.encode(USER_ENTITY.getPassword()));
-        userRepository.save(USER_ENTITY);
-        token = tokenProvider.generateToken(USER_ENTITY.getEmail());
-
         given()
                 .header("Authorization", "Bearer " + token)
                 .body(updatedUserJSON)
                 .contentType(ContentType.JSON)
                 .port(springBootPort)
-                .when()
-                .put(USER_URL)
-                .then()
+        .when()
+                .put(userUrl)
+        .then()
                 .statusCode(HttpStatus.ACCEPTED.value())
                 .body("firstName", equalTo("Dan"))
                 .body("lastName", equalTo("Do"))
                 .body("phone", equalTo("+380"));
-        userRepository.delete(USER_ENTITY);
     }
 
+    @Test
+    void updateUser_WhenUserNotLoggedInShouldReturnError() {
+        String updatedUserJSON = """
+                {
+                    "firstName": "Dan",
+                    "lastName": "Do",
+                    "phone": "+380"
+                }
+                """;
+        given()
+                .contentType("application/json")
+                .body(updatedUserJSON)
+                .contentType(ContentType.JSON)
+                .port(springBootPort)
+        .when()
+                .put(userUrl)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
 }
