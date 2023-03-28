@@ -20,7 +20,7 @@ public class ReviewController {
 
     @PostMapping("/apartments/{apartmentId}")
     public ResponseEntity<ReviewDto> addReview(@Valid @RequestBody ReviewDto reviewDTO,
-                                               @RequestParam long apartmentId) {
+                                               @PathVariable long apartmentId) {
         ReviewDto createdReview = reviewService.addReview(reviewDTO, apartmentId);
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
     }
