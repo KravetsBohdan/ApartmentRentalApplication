@@ -12,13 +12,13 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
 
 
-    @PostMapping("/{apartmentId}")
+    @PostMapping("/apartments/{apartmentId}")
     public ResponseEntity<ReviewDto> addReview(@Valid @RequestBody ReviewDto reviewDTO,
                                                @RequestParam long apartmentId) {
         ReviewDto createdReview = reviewService.addReview(reviewDTO, apartmentId);
@@ -38,7 +38,7 @@ public class ReviewController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/apartment/{apartmentId}")
+    @GetMapping("/apartments/{apartmentId}")
     public ResponseEntity<List<ReviewDto>> getReviewsByApartmentId(@PathVariable long apartmentId) {
         List<ReviewDto> reviews = reviewService.getReviewsByApartmentId(apartmentId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
