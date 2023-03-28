@@ -1,19 +1,20 @@
 package com.bkravets.apartmentrentalapp.service.impl;
 
 import com.bkravets.apartmentrentalapp.dto.ReviewDto;
-import com.bkravets.apartmentrentalapp.entity.Booking;
+import com.bkravets.apartmentrentalapp.entity.Apartment;
 import com.bkravets.apartmentrentalapp.entity.Review;
-import com.bkravets.apartmentrentalapp.entity.Status;
 import com.bkravets.apartmentrentalapp.entity.User;
+import com.bkravets.apartmentrentalapp.exception.AuthorizationException;
 import com.bkravets.apartmentrentalapp.exception.BadRequestException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
 import com.bkravets.apartmentrentalapp.mapper.ReviewMapper;
-import com.bkravets.apartmentrentalapp.repository.BookingRepository;
+import com.bkravets.apartmentrentalapp.repository.ApartmentRepository;
 import com.bkravets.apartmentrentalapp.repository.ReviewRepository;
 import com.bkravets.apartmentrentalapp.service.ReviewService;
 import com.bkravets.apartmentrentalapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,27 +22,23 @@ import java.util.List;
 @Service
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
-    private final BookingRepository bookingRepository;
+    private final ApartmentRepository apartmentRepository;
     private final UserService userService;
 
 
     @Override
+    @Transactional
     public ReviewDto addReview(ReviewDto reviewDTO, long apartmentId) {
         Review review = ReviewMapper.INSTANCE.toReview(reviewDTO);
-        if (review.getRating() < 1 || review.getRating() > 5) {
-            throw new BadRequestException("Rating must be between 1 and 5");
-        }
+
         User user = userService.getLoggedUser();
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Apartment not found"));
 
-        Booking booking = bookingRepository.findByTenantIdAndApartmentId(user.getId(), apartmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
-
-        if (booking.getStatus() != Status.APPROVED) {
-            throw new BadRequestException("You can't leave a review for an apartment you haven't stayed in");
-        }
+        validateOwnerNotReviewAuthor(apartment, user);
 
         review.setTenant(user);
-        review.setApartment(booking.getApartment());
+        review.setApartment(apartment);
         review = reviewRepository.save(review);
 
         return ReviewMapper.INSTANCE.toReviewDTO(review);
@@ -54,9 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         User user = userService.getLoggedUser();
 
-        if (!user.getEmail().equals(review.getTenant().getEmail())) {
-            throw new BadRequestException("You are not allowed to perform this action");
-        }
+        validateReviewOwnership(user, review);
 
         review.setRating(reviewDTO.getRating());
         review.setReviewText(reviewDTO.getReviewText());
@@ -71,9 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
-        if (!user.getEmail().equals(review.getTenant().getEmail())) {
-            throw new BadRequestException("You are not allowed to perform this action");
-        }
+        validateReviewOwnership(user, review);
         reviewRepository.delete(review);
     }
 
@@ -81,5 +74,17 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewDto> getReviewsByApartmentId(long apartmentId) {
         List<Review> reviews = reviewRepository.findAllByApartmentId(apartmentId);
         return ReviewMapper.INSTANCE.toReviewDTOs(reviews);
+    }
+
+    private void validateOwnerNotReviewAuthor(Apartment apartment, User user) {
+        if (apartment.getOwner().getId().equals(user.getId())) {
+            throw new BadRequestException("You cannot review your own apartment");
+        }
+    }
+
+    private void validateReviewOwnership(User user, Review review) {
+        if (!user.getId().equals(review.getTenant().getId())) {
+            throw new AuthorizationException("You are not allowed to perform this action");
+        }
     }
 }
