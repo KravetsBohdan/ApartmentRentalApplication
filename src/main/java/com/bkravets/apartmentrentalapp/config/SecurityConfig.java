@@ -4,6 +4,7 @@ import com.bkravets.apartmentrentalapp.security.JWTAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,8 +38,8 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                .requestMatchers("/api/apartments").permitAll()
-                .requestMatchers("/api/apartments/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/apartments").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/apartments/**" ).permitAll()
                 .requestMatchers("/api/users/login").permitAll()
                 .requestMatchers("/api/users/register").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
@@ -50,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://apartmentrental-frontend-production.up.railway.app"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://apartmentrental-frontend-production.up.railway.app"));
         configuration.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
