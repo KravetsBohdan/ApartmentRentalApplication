@@ -21,7 +21,4 @@ public class ReviewDto {
 
     @NotBlank(message = "Review text is mandatory")
     private String reviewText;
-
-    private Long apartmentId;
-    private Long userId;
 }
