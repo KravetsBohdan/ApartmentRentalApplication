@@ -3,6 +3,7 @@ package com.bkravets.apartmentrentalapp.service.impl;
 import com.bkravets.apartmentrentalapp.dto.ApartmentDto;
 import com.bkravets.apartmentrentalapp.entity.Apartment;
 import com.bkravets.apartmentrentalapp.entity.User;
+import com.bkravets.apartmentrentalapp.exception.AuthorizationException;
 import com.bkravets.apartmentrentalapp.exception.ResourceNotFoundException;
 import com.bkravets.apartmentrentalapp.repository.ApartmentRepository;
 import com.bkravets.apartmentrentalapp.service.UserService;
@@ -23,7 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ApartmentServiceImplTest {
+class ApartmentServiceTest {
 
     @Mock
     private ApartmentRepository apartmentRepository;
@@ -40,8 +41,8 @@ class ApartmentServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "new@email.com", "+38", "ren", "dou", "encriptedPassword", new ArrayList<>(), null, null);
-        apartment = new Apartment(1L, "Title 1", "Description 1", "City 1", "Location 1", 1, 1, "url", null, null, null);
+        user = new User(1L, "new@email.com", "+38", "ren", "dou", "encriptedPassword", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        apartment = new Apartment(1L, "Title 1", "Description 1", "City 1", "Location 1", 1, 1, "url", null, new ArrayList<>(), null);
         apartmentDto = new ApartmentDto(1L, "Title 1", "Description 1", "City 1", "Location 1", 1, 1, "url");
         user.setApartments(List.of(apartment));
         apartment.setOwner(user);
@@ -132,7 +133,7 @@ class ApartmentServiceImplTest {
 
         // When & Then
         assertThatThrownBy(() -> apartmentService.updateApartment(1L, updatedApartmentDto))
-                .isInstanceOf(ResourceNotFoundException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessage("You are not the owner of this apartment");
 
         verify(apartmentRepository).findById(1L);
@@ -176,7 +177,7 @@ class ApartmentServiceImplTest {
 
         // When & Then
         assertThatThrownBy(() -> apartmentService.deleteApartment(1L))
-                .isInstanceOf(ResourceNotFoundException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessage("You are not the owner of this apartment");
 
         verify(apartmentRepository).findById(1L);
